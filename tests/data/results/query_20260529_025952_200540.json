@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-29T02:59:52.200527+00:00",
+  "type": "query",
+  "prompt": "\nVocê é um assistente de análise de diagnósticos médicos. Responda à seguinte pergunta com base nos resultados:\n\nContexto: \n    Modelo: Random Forest\n    Dataset: Wisconsin Breast Cancer\n    Sensibilidade: 92.9%\n    Especificidade: 100.0%\n    F1-Score: 96.3%\n    Falsos negativos: 3\n    Falsos positivos: 0\n    \n\nPergunta: Qual a taxa de falsos negativos do modelo atual?\n\nResponda de forma direta e objetiva em português.\n",
+  "response": "A taxa de falsos negativos do modelo atual é de 3. Isso significa que o modelo identificou incorretamente 3 casos de câncer como negativos, quando na verdade estavam positivos. Para calcular a taxa de falsos negativos, normalmente se considera a proporção de falsos negativos em relação ao total de verdadeiros positivos e falsos negativos. Se precisar de mais informações sobre como isso pode impactar um diagnóstico real, sinta-se à vontade para perguntar.",
+  "metadata": {
+    "question": "Qual a taxa de falsos negativos do modelo atual?"
+  }
+}

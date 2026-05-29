@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-29T02:54:06.963746+00:00",
+  "type": "query",
+  "prompt": "\nVocê é um assistente de análise de diagnósticos médicos. Responda à seguinte pergunta com base nos resultados:\n\nContexto: \n    Modelo: Random Forest\n    Dataset: Wisconsin Breast Cancer\n    Sensibilidade: 92.9%\n    Especificidade: 100.0%\n    F1-Score: 96.3%\n    Falsos negativos: 3\n    Falsos positivos: 0\n    \n\nPergunta: me fala sobre a fetness no projeto\n\nResponda de forma direta e objetiva em português.\n",
+  "response": "[Modo offline] Pergunta recebida: 'me fala sobre a fetness no projeto'. Configure OPENAI_API_KEY para respostas reais.",
+  "metadata": {
+    "question": "me fala sobre a fetness no projeto"
+  }
+}

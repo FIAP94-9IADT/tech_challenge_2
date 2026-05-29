@@ -6,13 +6,17 @@ Otimização de modelos de diagnóstico para saúde da mulher
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_ROOT / ".env")
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from sklearn.model_selection import train_test_split
 
-_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT / "tests"))  # src/ lives inside tests/
 
 from src.data.loader import load_dataset, get_feature_description
@@ -47,7 +51,7 @@ st.markdown("""
 
 # ── Labels dos métodos ────────────────────────────────────────────────────────
 _METHOD_LABELS = {
-    "genetic_algorithm": "Algoritmo Genérico (AG)",
+    "genetic_algorithm": "Algoritmo Genético (AG)",
     "grid_search": "Grid Search (Força Bruta)",
     "random_search": "Random Search (Estocástico)",
     "nsga2": "NSGA-II (Multi-Objetivo)",
@@ -80,6 +84,10 @@ with st.sidebar:
     mutation_rate = 0.15
     crossover_rate = 0.80
     random_state = 42
+    cx_method = "uniform"
+    mut_method = "random_reset"
+    mut_intensity = 1.0
+    adaptive_rates = False
     rs_iters = 50
     rs_cv = 3
     gs_cv = 3
@@ -95,6 +103,26 @@ with st.sidebar:
         mutation_rate = st.slider("Taxa de mutação", 0.01, 0.50, 0.15, 0.01)
         crossover_rate = st.slider("Taxa de crossover", 0.50, 1.00, 0.80, 0.05)
         random_state = st.number_input("Semente aleatória", value=42)
+        cx_method = st.selectbox(
+            "Método de crossover",
+            ["uniform", "arithmetic"],
+            format_func=lambda x: "Uniforme" if x == "uniform" else "Aritmético",
+            help="Aritmético: combina parâmetros numéricos por interpolação linear (Aula 3)",
+        )
+        mut_method = st.selectbox(
+            "Método de mutação",
+            ["random_reset", "gaussian"],
+            format_func=lambda x: "Reset aleatório" if x == "random_reset" else "Gaussiana",
+            help="Gaussiana: perturbação contínua em parâmetros numéricos (Aula 3)",
+        )
+        mut_intensity = 1.0
+        if mut_method == "gaussian":
+            mut_intensity = st.slider("Intensidade da mutação gaussiana", 0.5, 3.0, 1.0, 0.5)
+        adaptive_rates = st.toggle(
+            "Taxas adaptativas",
+            value=False,
+            help="Ajusta automaticamente mutação e crossover conforme a entropia genética (Aula 3)",
+        )
     elif optim_method == "random_search":
         st.subheader("Parâmetros — Random Search")
         rs_iters = st.slider("Iterações", 20, 200, 50, 10)
@@ -238,6 +266,10 @@ with tab_optimize:
                 mutation_rate=mutation_rate,
                 crossover_rate=crossover_rate,
                 random_state=int(random_state),
+                crossover_method=cx_method,
+                mutation_method=mut_method,
+                mutation_intensity=mut_intensity,
+                adaptive=adaptive_rates,
             )
             progress_bar = st.progress(0)
             status = st.empty()
@@ -288,9 +320,35 @@ with tab_optimize:
             fig_conv.add_trace(go.Scatter(
                 y=ga_result.avg_fitness_per_gen, name="Média", line=dict(color="#7f8c8d", dash="dash")
             ))
+            if ga_result.std_fitness_per_gen:
+                fig_conv.add_trace(go.Scatter(
+                    y=ga_result.std_fitness_per_gen, name="Desvio Padrão",
+                    line=dict(color="#3498db", dash="dot"),
+                ))
             fig_conv.update_layout(title="Curva de Convergência", xaxis_title="Geração",
                                    yaxis_title="Fitness", height=350)
             st.plotly_chart(fig_conv, width="stretch")
+
+            if ga_result.diversity_per_gen:
+                fig_div = go.Figure()
+                fig_div.add_trace(go.Scatter(
+                    y=ga_result.diversity_per_gen,
+                    name="Entropia Genética",
+                    line=dict(color="#27ae60", width=2),
+                    fill="tozeroy",
+                    fillcolor="rgba(39,174,96,0.1)",
+                ))
+                fig_div.update_layout(
+                    title="Diversidade Genética (Entropia)",
+                    xaxis_title="Geração",
+                    yaxis_title="H (bits)",
+                    height=280,
+                )
+                st.plotly_chart(fig_div, width="stretch")
+                st.caption(
+                    "Entropia alta = população diversificada (exploração). "
+                    "Entropia baixa = convergência (aproveitamento)."
+                )
 
         # ── Grid Search ───────────────────────────────────────────────────────
         elif optim_method == "grid_search":

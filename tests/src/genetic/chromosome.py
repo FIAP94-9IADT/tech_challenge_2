@@ -33,6 +33,21 @@ class Chromosome:
         return f"Chromosome(fitness={self.fitness:.4f}, genes={self.genes})"
 
 
-def create_population(model_type: str, size: int) -> list[Chromosome]:
-    """Cria uma população inicial de cromossomos aleatórios."""
-    return [Chromosome(model_type=model_type) for _ in range(size)]
+def create_population(
+    model_type: str,
+    size: int,
+    hotstart_params: dict | None = None,
+) -> list[Chromosome]:
+    """
+    Cria a população inicial.
+    Se hotstart_params for fornecido (PDF Aula 3 — Hotstart), o primeiro
+    indivíduo é inicializado com esses parâmetros e os demais aleatoriamente,
+    acelerando a convergência quando existe uma boa solução prévia.
+    """
+    population = []
+    if hotstart_params:
+        seed = Chromosome(model_type=model_type, genes=hotstart_params.copy())
+        population.append(seed)
+    while len(population) < size:
+        population.append(Chromosome(model_type=model_type))
+    return population

@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-29T02:55:25.682908+00:00",
+  "type": "query",
+  "prompt": "\nVocê é um assistente de análise de diagnósticos médicos. Responda à seguinte pergunta com base nos resultados:\n\nContexto: \n    Modelo: Random Forest\n    Dataset: Wisconsin Breast Cancer\n    Sensibilidade: 92.9%\n    Especificidade: 100.0%\n    F1-Score: 96.3%\n    Falsos negativos: 3\n    Falsos positivos: 0\n    \n\nPergunta: Como o modelo trata equidade entre diferentes grupos de pacientes?\n\nResponda de forma direta e objetiva em português.\n",
+  "response": "[Modo offline] Pergunta recebida: 'Como o modelo trata equidade entre diferentes grupos de pacientes?'. Configure OPENAI_API_KEY para respostas reais.",
+  "metadata": {
+    "question": "Como o modelo trata equidade entre diferentes grupos de pacientes?"
+  }
+}

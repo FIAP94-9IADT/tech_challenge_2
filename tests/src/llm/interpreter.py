@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from src.llm.prompts import SYSTEM_PROMPT, build_diagnosis_prompt, ROUTE_QUERY_PROMPT
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent.parent.parent / ".env")
 
 RESULTS_DIR = Path(__file__).parent.parent.parent / "data" / "results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)

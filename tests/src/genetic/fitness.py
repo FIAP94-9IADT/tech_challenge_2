@@ -1,3 +1,6 @@
+import math
+from collections import Counter
+
 import numpy as np
 from sklearn.metrics import (
     recall_score,
@@ -81,6 +84,25 @@ def evaluate_chromosome(
         return calculate_fitness(y_val.values, y_pred, age_val)
     except Exception:
         return 0.0
+
+
+def genetic_entropy(population: list[Chromosome]) -> float:
+    """
+    Entropia genética da população (PDF Aula 3 — Diversidade).
+    H = -sum(p_i * log2(p_i))
+    Valor alto → população diversificada; valor baixo → convergência.
+    """
+    if not population:
+        return 0.0
+    counts = Counter(str(sorted(c.genes.items())) for c in population)
+    n = len(population)
+    return -sum((cnt / n) * math.log2(cnt / n) for cnt in counts.values())
+
+
+def fitness_std(population: list[Chromosome]) -> float:
+    """Desvio padrão da aptidão na população (PDF Aula 3 — Convergência)."""
+    fitnesses = [c.fitness for c in population]
+    return float(np.std(fitnesses))
 
 
 def get_detailed_metrics(y_true, y_pred) -> dict:
