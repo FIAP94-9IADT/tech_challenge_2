@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-26T20:04:26.470824+00:00",
+  "type": "query",
+  "prompt": "\nVocê é um assistente de análise de diagnósticos médicos. Responda à seguinte pergunta com base nos resultados:\n\nContexto: \n    Modelo: Random Forest\n    Dataset: Wisconsin Breast Cancer\n    Sensibilidade: 92.9%\n    Especificidade: 100.0%\n    F1-Score: 96.3%\n    Falsos negativos: 3\n    Falsos positivos: 0\n    \n\nPergunta: Por que a sensibilidade é mais importante que a especificidade nesse contexto?\n\nResponda de forma direta e objetiva em português.\n",
+  "response": "A sensibilidade é mais importante que a especificidade no contexto do câncer de mama porque ela mede a capacidade do modelo de identificar corretamente os casos positivos, ou seja, aqueles que realmente têm a doença. Em diagnósticos de câncer, é crucial detectar a doença o mais cedo possível para aumentar as chances de tratamento eficaz e sobrevida. Um alto nível de sensibilidade garante que a maioria das pacientes com câncer seja identificada, minimizando o risco de atrasos no tratamento. Em contrapartida, uma especificidade de 100%, que indica que não há falsos positivos, é desejável, mas pode ser considerado menos crítico do que a identificação precisa de todos os casos de câncer.",
+  "metadata": {
+    "question": "Por que a sensibilidade é mais importante que a especificidade nesse contexto?"
+  }
+}

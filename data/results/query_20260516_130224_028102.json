@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-16T13:02:24.028088+00:00",
+  "type": "query",
+  "prompt": "\nVocê é um assistente de análise de diagnósticos médicos. Responda à seguinte pergunta com base nos resultados:\n\nContexto: \n    Modelo: Random Forest\n    Dataset: Wisconsin Breast Cancer\n    Sensibilidade: 92.9%\n    Especificidade: 100.0%\n    F1-Score: 96.3%\n    Falsos negativos: 3\n    Falsos positivos: 0\n    \n\nPergunta: Quais são os riscos de um falso negativo no diagnóstico de câncer de mama?\n\nResponda de forma direta e objetiva em português.\n",
+  "response": "Os riscos de um falso negativo no diagnóstico de câncer de mama incluem:\n\n1. **Atraso no tratamento**: A paciente pode não receber o tratamento necessário a tempo, o que pode permitir que o câncer progrida e se torne mais grave.\n\n2. **Sentimento de falsa segurança**: A paciente pode acreditar que está livre da doença, o que pode levar a um descuido em relação ao monitoramento da saúde e à realização de exames de seguimento.\n\n3. **Avanço da doença**: Um diagnóstico tardio pode resultar em opções de tratamento menos eficazes e um pior prognóstico.\n\n4. **Impacto emocional**: O diagnóstico inicial incorreto pode gerar angústia psicológica quando a doença é finalmente diagnosticada em um estágio mais avançado.\n\nÉ sempre importante seguir as orientações médicas e realizar avaliações regulares para assegurar a saúde mamária.",
+  "metadata": {
+    "question": "Quais são os riscos de um falso negativo no diagnóstico de câncer de mama?"
+  }
+}
