@@ -84,7 +84,7 @@ class RouteApp:
             ("cities", "Entregas", "10", int), ("vehicles", "Veículos", "3", int),
             ("capacity", "Capacidade (kg)", "55", float), ("autonomy", "Autonomia (km)", "65", float),
             ("population", "População", "120", int), ("generations", "Gerações", "300", int),
-            ("crossover", "Crossover", "0.90", float), ("mutation", "Mutação", "0.20", float),
+            ("crossover", "Taxa de Crossover", "0.90", float), ("mutation", "Taxa de Mutação", "0.20", float),
             ("seed", "Semente", "42", int), ("elite", "Elitismo", "4", int),
         ]
         fields = {}

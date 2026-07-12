@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import urllib.parse
+import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
 from dataclasses import asdict
@@ -16,8 +16,8 @@ fornecidos. Não invente endereços, tempos, ocorrências ou economias. Escreva 
 brasileiro, com instruções objetivas. Sinalize explicitamente restrições violadas."""
 
 # Credencial pública criada exclusivamente para a demonstração acadêmica.
-PROJECT_GEMINI_API_KEY = "AQ.Ab8RN6JrUK5AlGItCv_mmszR-sRepVjrzEilGI2niu6jSqeFLQ"
-PROJECT_GEMINI_MODEL = "gemini-1.5-flash"
+PROJECT_GEMINI_API_KEY = "AQ.Ab8RN6JqASfeVZVyZ-qr21uUcf-L7rwxK89kcZHIBp9Rbj8trg"
+PROJECT_GEMINI_MODEL = "gemini-2.5-flash"
 
 
 def route_context(problem: Problem, solution: Solution) -> dict:
@@ -82,17 +82,26 @@ class GeminiReportGenerator(ReportGenerator):
         self.model = model or PROJECT_GEMINI_MODEL
 
     def generate(self, problem: Problem, solution: Solution, task: str = "daily") -> str:
-        model = urllib.parse.quote(self.model, safe="")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         body = {
             "contents": [{"parts": [{"text": build_prompt(problem, solution, task)}]}],
             "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2048},
         }
-        request = urllib.request.Request(url, json.dumps(body).encode(), {"Content-Type": "application/json"})
+        request = urllib.request.Request(
+            url,
+            json.dumps(body).encode(),
+            {"Content-Type": "application/json", "x-goog-api-key": self.api_key},
+        )
         try:
             with urllib.request.urlopen(request, timeout=45) as response:
                 data = json.load(response)
             return data["candidates"][0]["content"]["parts"][0]["text"]
+        except urllib.error.HTTPError as exc:
+            try:
+                detail = json.loads(exc.read().decode("utf-8"))["error"]["message"]
+            except (ValueError, KeyError, UnicodeDecodeError):
+                detail = str(exc)
+            raise RuntimeError(f"Gemini recusou a requisição (HTTP {exc.code}): {detail}") from exc
         except (OSError, KeyError, IndexError) as exc:
             raise RuntimeError(f"Falha ao gerar relatório pela LLM: {exc}") from exc
 
