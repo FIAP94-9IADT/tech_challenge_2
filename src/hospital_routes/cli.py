@@ -8,7 +8,7 @@ from pathlib import Path
 from .baselines import nearest_neighbor
 from .genetic import GAConfig, GeneticOptimizer
 from .io import load_problem, save_solution
-from .reporting import GeminiReportGenerator, LocalReportGenerator
+from .reporting import GeminiReportGenerator, LocalReportGenerator, comparison_metrics
 from .visualization import save_convergence_plot, save_route_map
 
 
@@ -27,15 +27,16 @@ def main() -> None:
     optimizer = GeneticOptimizer(problem, GAConfig(seed=args.seed, generations=args.generations))
     baseline = nearest_neighbor(optimizer)
     solution = optimizer.run()
+    comparison = comparison_metrics(solution, baseline)
 
     save_solution(output / "solution.json", problem, solution)
     save_route_map(problem, solution, output / "routes_map.html")
     save_convergence_plot(optimizer.history, output / "convergence.png")
     try:
         generator = GeminiReportGenerator() if args.llm == "gemini" else LocalReportGenerator()
-        report = generator.generate(problem, solution)
+        report = generator.generate(problem, solution, comparison=comparison)
     except RuntimeError as exc:
-        report = LocalReportGenerator().generate(problem, solution)
+        report = LocalReportGenerator().generate(problem, solution, comparison=comparison)
         report += f"\n\n> Relatório local utilizado porque o Gemini ficou indisponível: {exc}"
         print(f"Aviso: {exc}")
     (output / "daily_report.md").write_text(report, encoding="utf-8")

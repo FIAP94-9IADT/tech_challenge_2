@@ -11,8 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from hospital_routes.genetic import GAConfig, GeneticOptimizer  # noqa: E402
+from hospital_routes.baselines import nearest_neighbor  # noqa: E402
 from hospital_routes.io import load_problem, save_solution  # noqa: E402
-from hospital_routes.reporting import GeminiReportGenerator, LocalReportGenerator  # noqa: E402
+from hospital_routes.reporting import (  # noqa: E402
+    GeminiReportGenerator,
+    LocalReportGenerator,
+    comparison_metrics,
+)
 from hospital_routes.visualization import save_convergence_plot, save_route_map  # noqa: E402
 
 
@@ -69,16 +74,18 @@ def main() -> None:
         seed=args.seed,
     )
     optimizer = GeneticOptimizer(problem, config)
+    baseline = nearest_neighbor(optimizer)
     solution = optimizer.run()
+    comparison = comparison_metrics(solution, baseline)
 
     save_solution(output / "solution.json", problem, solution)
     save_route_map(problem, solution, output / "routes_map.html")
     save_convergence_plot(optimizer.history, output / "convergence.png")
     try:
-        report = GeminiReportGenerator().generate(problem, solution)
+        report = GeminiReportGenerator().generate(problem, solution, comparison=comparison)
     except RuntimeError as exc:
         # O job de otimização continua auditável mesmo se o provedor estiver indisponível.
-        report = LocalReportGenerator().generate(problem, solution)
+        report = LocalReportGenerator().generate(problem, solution, comparison=comparison)
         report += f"\n\n> Integração generativa indisponível durante o job: {exc}"
     (output / "daily_report.md").write_text(report, encoding="utf-8")
     with (output / "history.csv").open("w", newline="", encoding="utf-8") as file:

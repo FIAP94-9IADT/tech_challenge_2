@@ -1,5 +1,6 @@
 from hospital_routes.genetic import GAConfig, GeneticOptimizer
-from hospital_routes.models import flatten
+from hospital_routes.baselines import brute_force, nearest_neighbor
+from hospital_routes.models import Delivery, Depot, Problem, Vehicle, flatten
 
 
 def test_crossover_preserves_permutation(problem):
@@ -35,3 +36,31 @@ def test_penalty_marks_infeasible_solution(problem):
     solution = optimizer.evaluate_routes(routes)
     assert not solution.feasible
     assert solution.metrics[0].capacity_excess_kg > 0
+
+
+def test_priority_term_favors_critical_delivery_first():
+    scenario = Problem(
+        depot=Depot("Hospital", 0.0, 0.0),
+        deliveries=(
+            Delivery("C", "Crítica", 0.0, 0.01, 1.0, priority=3),
+            Delivery("R", "Regular", 0.0, 0.02, 1.0, priority=1),
+        ),
+        vehicles=(Vehicle("V1", capacity_kg=10.0, max_distance_km=100.0),),
+    )
+    optimizer = GeneticOptimizer(scenario, GAConfig(population_size=10, generations=2))
+    critical_first = optimizer.evaluate_routes([[0, 1]])
+    regular_first = optimizer.evaluate_routes([[1, 0]])
+    assert critical_first.total_distance_km == regular_first.total_distance_km
+    assert critical_first.fitness < regular_first.fitness
+
+
+def test_zero_elitism_is_supported(problem):
+    config = GAConfig(population_size=20, generations=5, elite_size=0, seed=9)
+    result = GeneticOptimizer(problem, config).run()
+    assert sorted(flatten(result.routes)) == list(range(len(problem.deliveries)))
+
+
+def test_brute_force_is_not_worse_than_nearest_neighbor(problem):
+    reduced = Problem(problem.depot, problem.deliveries[:6], problem.vehicles)
+    optimizer = GeneticOptimizer(reduced, GAConfig(population_size=10, generations=2))
+    assert brute_force(optimizer).fitness <= nearest_neighbor(optimizer).fitness

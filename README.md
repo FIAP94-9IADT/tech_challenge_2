@@ -25,6 +25,9 @@ python -m hospital_routes.cli --input data/deliveries.json --output outputs
 Abra `notebooks/projeto_completo.ipynb` no VS Code ou Jupyter, selecione o kernel da
 `.venv` e use **Executar tudo**. O próprio notebook prepara o projeto, permite alterar
 cenário e parâmetros, acompanha a convergência e gera todos os arquivos em `outputs`.
+Ele também verifica a viabilidade básica, compara força bruta, vizinho mais próximo e
+algoritmo genético, repete o experimento com sementes diferentes e explica como
+interpretar as métricas sem inferir tempo ou custo não observados.
 
 ## Azure Machine Learning
 
@@ -82,6 +85,9 @@ jupyter notebook notebooks/demonstracao.ipynb
 - `tests`: testes unitários e de integração;
 - `docs`: relatório técnico, arquitetura e documentação de uso;
 - `infra`: infraestrutura como código para execução conteinerizada em nuvem.
+
+Não há API REST nesta arquitetura. A solução é disponibilizada pela interface Pygame,
+notebooks, CLI e job do Azure ML; por isso, a documentação HTTP não se aplica.
 
 Consulte [docs/relatorio_tecnico.md](docs/relatorio_tecnico.md) para as decisões de
 modelagem, limitações e análises.

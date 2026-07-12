@@ -8,6 +8,20 @@ objetivo da solução é reduzir o percurso total sem perder de vista a priorida
 clínica, a capacidade de carga e a autonomia de cada veículo. O cenário utilizado é
 fictício e contém um depósito, dez pontos de entrega e três veículos.
 
+### 1.1 Método de desenvolvimento e avaliação
+
+O desenvolvimento partiu da formulação didática do TSP apresentada nas aulas:
+representação por permutação, matriz de distâncias, função de aptidão, seleção,
+crossover ordenado, mutação e acompanhamento da convergência. A evolução para o
+contexto hospitalar ocorreu em incrementos verificáveis: primeiro foram incluídas
+prioridades; depois, capacidade e autonomia; por fim, a permutação passou a ser
+decodificada em uma rota para cada veículo. Essa estratégia mantém os operadores
+adequados ao TSP e concentra as regras adicionais na avaliação e na decodificação.
+
+A avaliação combina testes automatizados, algoritmos de referência, repetições com
+sementes distintas e inspeção visual das rotas e da convergência. Os resultados
+numéricos se referem ao cenário fictício versionado em `data/deliveries.json`.
+
 ## 2. Modelagem do problema
 
 O problema clássico do caixeiro viajante procura a menor rota que visita cada ponto
@@ -90,6 +104,33 @@ próximo. Comparações devem usar a mesma função de aptidão e a mesma instâ
 e economia monetária não são inventados: só podem ser calculados quando houver dados
 históricos ou medições reais.
 
+### 5.1 Protocolo experimental e resultados
+
+No cenário completo, o algoritmo foi executado cinco vezes com população 80, limite
+de 150 gerações, estagnação de 50 gerações e sementes 7, 21, 42, 84 e 123. A mesma
+função de aptidão foi usada em todas as abordagens. O vizinho mais próximo obteve
+fitness `150,17`. Os resultados do algoritmo genético foram:
+
+| Semente | Fitness | Distância (km) | Gerações | Redução de fitness frente à referência |
+|---:|---:|---:|---:|---:|
+| 7 | 123,97 | 67,58 | 75 | 17,55% |
+| 21 | 123,97 | 67,58 | 78 | 17,55% |
+| 42 | 126,92 | 65,34 | 79 | 15,58% |
+| 84 | 127,44 | 68,54 | 65 | 15,24% |
+| 123 | 123,97 | 67,58 | 101 | 17,55% |
+
+A média foi `125,25`, com desvio-padrão populacional `1,58`; a redução média de
+fitness foi `16,70%`. A menor distância não coincide necessariamente com o menor
+fitness, pois a função também valoriza o atendimento antecipado das entregas
+prioritárias. A variação entre sementes é esperada em uma meta-heurística e justifica
+reportar mais de uma execução.
+
+Em uma subinstância com oito entregas, a força bruta encontrou fitness `91,22` e
+distância `54,72 km`; o algoritmo genético alcançou o mesmo resultado. O vizinho mais
+próximo obteve fitness `123,99` e distância `72,62 km`. Tempos de execução não são
+generalizados, pois dependem do equipamento e da configuração. O notebook calcula
+novamente as medidas, permitindo confrontar o texto com a execução corrente.
+
 ## 6. Visualização e análise
 
 O mapa HTML apresenta o depósito, a sequência numerada das paradas e uma cor para
@@ -114,6 +155,17 @@ O modo local mantém testes e demonstrações reproduzíveis. Respostas da LLM d
 revisadas por uma pessoa antes do uso operacional, pois modelos generativos podem
 alucinar. Dados pessoais e clínicos não devem ser enviados; o exemplo usa somente
 identificadores operacionais fictícios.
+
+As tarefas disponibilizadas abrangem instruções por veículo, resumo diário, relatório
+semanal com sugestões e respostas a perguntas em linguagem natural. O contexto inclui
+somente valores calculados pelo otimizador e pelo comparativo. A saída não altera rotas
+nem decisões de viabilidade: sua função é explicar os resultados.
+
+O RAG estudado nas aulas não foi aplicado porque não há, neste escopo, uma coleção
+documental externa a ser recuperada. O aterramento ocorre diretamente pelo JSON da
+solução. Incluir busca vetorial sem uma base de protocolos ou manuais acrescentaria
+complexidade sem evidência adicional. Caso documentos institucionais sejam incluídos,
+eles deverão ser versionados e recuperados com referência de origem.
 
 ## 8. Arquitetura e infraestrutura
 
@@ -174,7 +226,58 @@ Os testes verificam distância, validações, preservação da permutação pelo
 prompt. A execução completa é feita com `pytest`. O notebook reproduz o experimento,
 compara a linha de base e gera as visualizações.
 
-## 10. Conclusão
+O ambiente é descrito em `pyproject.toml`, `requirements.txt`, `Dockerfile` e nos
+arquivos do Azure ML. A semente controla a aleatoriedade, mas a repetição exata também
+depende das versões das bibliotecas. O notebook principal registra parâmetros,
+métricas e artefatos, enquanto o job em nuvem registra métricas no MLflow.
+
+## 10. Rastreabilidade dos requisitos e entregáveis
+
+| Critério | Evidência principal | Situação |
+|---|---|---|
+| Representação genética de rotas | `src/hospital_routes/genetic.py` | Atendido |
+| Seleção, crossover e mutação especializados | torneio, OX1, troca e inversão | Atendido |
+| Fitness com distância e prioridade | avaliação e matriz Haversine | Atendido |
+| Capacidade, autonomia e múltiplos veículos | decodificador e penalidades | Atendido |
+| Cenários customizáveis e elitismo opcional | interface Pygame e notebooks | Atendido |
+| Mapa e convergência | `visualization.py` e interface em tempo real | Atendido |
+| Instruções, relatórios e melhorias com LLM | `reporting.py` | Atendido |
+| Perguntas em linguagem natural | tarefa `question` demonstrada no notebook | Atendido |
+| Prompt estruturado e prevenção de alucinação | `build_prompt` e contexto JSON | Atendido |
+| Projeto Python e ambiente virtual | pacote em `src`, `pyproject.toml` e README | Atendido |
+| Diagramas de arquitetura | `docs/arquitetura.md` e seção 8 | Atendido |
+| Testes automatizados | diretório `tests` | Atendido |
+| Infraestrutura como código | Terraform local e Azure | Atendido |
+| Scripts e notebooks de demonstração | três notebooks e CLI | Atendido |
+| Comparativo de desempenho | seção 5 e notebook principal | Atendido |
+| Configuração opcional em nuvem | `azure`, `infra/azure` e notebook Azure ML | Atendido |
+| Documentação de API REST | não aplicável: não há serviço HTTP | Justificado |
+
+A ausência de uma API REST é uma decisão de arquitetura: as superfícies são a
+interface interativa, os notebooks, a CLI e o job Azure ML. Portanto, não há endpoints
+a documentar. As funções públicas e os argumentos da CLI são documentados no código e
+em `docs/uso.md`.
+
+## 11. Limitações, validade e uso responsável
+
+- A distância geodésica não representa malha viária, trânsito, bloqueios ou tempo de
+  atendimento; por isso, não se afirma economia temporal ou monetária.
+- As restrições são flexíveis. Uma solução inviável é um diagnóstico do cenário, não
+  uma autorização para executar entregas acima dos limites.
+- A força bruta é usada apenas em instâncias reduzidas devido ao crescimento fatorial.
+- O algoritmo genético não garante ótimo global; múltiplas sementes e uma referência
+  conhecida reduzem, mas não eliminam, essa ameaça à validade.
+- Os dados são fictícios e não incluem pacientes. Uma aplicação institucional exigiria
+  minimização de dados, controle de acesso, retenção definida e revisão humana.
+- Instruções da LLM podem conter omissões. O JSON da solução é a fonte de verdade, e o
+  relatório precisa de validação operacional antes do uso.
+
+Embora o processamento seja executado no Azure Machine Learning, não há treinamento
+de um modelo preditivo. O algoritmo genético é um método de otimização, e MLflow é
+utilizado para rastrear experimentos e hiperparâmetros. Essa distinção evita classificar
+incorretamente a busca combinatória como aprendizado supervisionado.
+
+## 12. Conclusão
 
 A combinação de representação combinatória e decodificação multi-veículo preserva os
 operadores próprios do TSP e incorpora restrições logísticas. A aptidão torna explícito

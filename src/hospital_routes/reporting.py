@@ -41,8 +41,37 @@ def configured_gemini_key() -> str | None:
     return os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or _load_local_key()
 
 
-def route_context(problem: Problem, solution: Solution) -> dict:
+def comparison_metrics(solution: Solution, baseline: Solution) -> dict:
+    """Compara duas soluções sem inferir tempo ou custo não observados."""
+    fitness_reduction = 100 * (baseline.fitness - solution.fitness) / baseline.fitness
+    distance_reduction = baseline.total_distance_km - solution.total_distance_km
+    distance_reduction_pct = (
+        100 * distance_reduction / baseline.total_distance_km
+        if baseline.total_distance_km
+        else 0.0
+    )
     return {
+        "referencia": "vizinho mais próximo",
+        "fitness_referencia": round(baseline.fitness, 4),
+        "fitness_solucao": round(solution.fitness, 4),
+        "reducao_fitness_percentual": round(fitness_reduction, 2),
+        "distancia_referencia_km": round(baseline.total_distance_km, 4),
+        "distancia_solucao_km": round(solution.total_distance_km, 4),
+        "reducao_distancia_km": round(distance_reduction, 4),
+        "reducao_distancia_percentual": round(distance_reduction_pct, 2),
+        "observacao": (
+            "Não há dados de velocidade, tempo real ou custo monetário; "
+            "essas economias não devem ser estimadas."
+        ),
+    }
+
+
+def route_context(
+    problem: Problem,
+    solution: Solution,
+    comparison: dict | None = None,
+) -> dict:
+    context = {
         "deposito": asdict(problem.depot),
         "distancia_total_km": round(solution.total_distance_km, 2),
         "solucao_viavel": solution.feasible,
@@ -55,9 +84,17 @@ def route_context(problem: Problem, solution: Solution) -> dict:
             for i, route in enumerate(solution.routes)
         ],
     }
+    if comparison:
+        context["comparacao_de_eficiencia"] = comparison
+    return context
 
 
-def build_prompt(problem: Problem, solution: Solution, task: str = "daily") -> str:
+def build_prompt(
+    problem: Problem,
+    solution: Solution,
+    task: str = "daily",
+    comparison: dict | None = None,
+) -> str:
     requests = {
         "daily": "Gere instruções por veículo e um resumo diário de eficiência.",
         "weekly": "Gere um relatório semanal e sugestões prudentes de melhoria.",
@@ -65,21 +102,45 @@ def build_prompt(problem: Problem, solution: Solution, task: str = "daily") -> s
     }
     return (
         f"{SYSTEM_INSTRUCTION}\n\nTarefa: {requests.get(task, task)}\n"
-        f"Contexto estruturado:\n{json.dumps(route_context(problem, solution), ensure_ascii=False, indent=2)}"
+        "Não converta distância em tempo ou dinheiro sem dados observados.\n"
+        f"Contexto estruturado:\n{json.dumps(route_context(problem, solution, comparison), ensure_ascii=False, indent=2)}"
     )
 
 
 class ReportGenerator(ABC):
     @abstractmethod
-    def generate(self, problem: Problem, solution: Solution, task: str = "daily") -> str: ...
+    def generate(
+        self,
+        problem: Problem,
+        solution: Solution,
+        task: str = "daily",
+        comparison: dict | None = None,
+    ) -> str: ...
 
 
 class LocalReportGenerator(ReportGenerator):
     """Fallback auditável para execução acadêmica sem credenciais externas."""
 
-    def generate(self, problem: Problem, solution: Solution, task: str = "daily") -> str:
+    def generate(
+        self,
+        problem: Problem,
+        solution: Solution,
+        task: str = "daily",
+        comparison: dict | None = None,
+    ) -> str:
         lines = ["# Plano operacional de entregas", "", f"Distância total: {solution.total_distance_km:.2f} km."]
         lines.append("Todas as restrições foram atendidas." if solution.feasible else "Atenção: há restrições violadas; revise o planejamento.")
+        if comparison:
+            lines.extend([
+                "",
+                "## Comparação de eficiência",
+                (
+                    f"Referência: {comparison['referencia']}; redução de fitness: "
+                    f"{comparison['reducao_fitness_percentual']:.2f}%; variação de distância: "
+                    f"{comparison['reducao_distancia_km']:.2f} km."
+                ),
+                comparison["observacao"],
+            ])
         for i, route in enumerate(solution.routes):
             vehicle, metric = problem.vehicles[i], solution.metrics[i]
             lines.extend(["", f"## {vehicle.id}", f"Carga: {metric.load_kg:.1f}/{vehicle.capacity_kg:.1f} kg; percurso: {metric.distance_km:.2f}/{vehicle.max_distance_km:.2f} km."])
@@ -107,10 +168,16 @@ class GeminiReportGenerator(ReportGenerator):
                 "no ambiente, no kernel ou em um arquivo .env local."
             )
 
-    def generate(self, problem: Problem, solution: Solution, task: str = "daily") -> str:
+    def generate(
+        self,
+        problem: Problem,
+        solution: Solution,
+        task: str = "daily",
+        comparison: dict | None = None,
+    ) -> str:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         body = {
-            "contents": [{"parts": [{"text": build_prompt(problem, solution, task)}]}],
+            "contents": [{"parts": [{"text": build_prompt(problem, solution, task, comparison)}]}],
             "generationConfig": {"temperature": 0.2, "maxOutputTokens": 8192},
         }
         request = urllib.request.Request(
