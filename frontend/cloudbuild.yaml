@@ -1,0 +1,18 @@
+# Build do frontend com a URL do backend injetada em build time (Vite).
+# Uso:
+#   gcloud builds submit frontend --config frontend/cloudbuild.yaml \
+#     --substitutions=_VITE_API_URL=https://rotas-backend-XXXX.run.app,_IMAGE=us-central1-docker.pkg.dev/PROJETO/rotas-medicas/frontend:latest
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --build-arg
+      - VITE_API_URL=${_VITE_API_URL}
+      - -t
+      - ${_IMAGE}
+      - .
+images:
+  - ${_IMAGE}
+substitutions:
+  _VITE_API_URL: http://localhost:8000
+  _IMAGE: us-central1-docker.pkg.dev/PROJECT/rotas-medicas/frontend:latest

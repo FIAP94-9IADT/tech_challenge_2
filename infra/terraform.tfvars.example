@@ -1,0 +1,5 @@
+# Copie para terraform.tfvars e preencha com os seus valores
+project_id     = "meu-projeto-gcp"
+region         = "us-central1"
+backend_image  = "us-central1-docker.pkg.dev/meu-projeto-gcp/rotas-medicas/backend:latest"
+frontend_image = "us-central1-docker.pkg.dev/meu-projeto-gcp/rotas-medicas/frontend:latest"
