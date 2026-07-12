@@ -34,6 +34,14 @@ fica em `infra/azure`. Depois do provisionamento, abra `notebooks/azure_ml.ipynb
 informe assinatura, Resource Group e workspace e execute as células para registrar os
 ativos e submeter os jobs.
 
+## Configuração segura do Gemini
+
+Crie uma chave em um projeto autorizado no Google AI Studio e mantenha-a fora do Git.
+Para execução local, copie `.env.example` para `.env` e preencha `GEMINI_API_KEY`.
+Os notebooks informam se a chave foi detectada e continuam com o gerador local quando
+ela não estiver disponível. Em Docker e Azure, forneça `GEMINI_API_KEY` como variável
+protegida.
+
 A interface permite alterar quantidade de entregas e veículos, capacidade, autonomia,
 população, gerações, taxas de crossover e mutação e semente aleatória. Os pontos de
 entrega podem ser arrastados no mapa; um clique curto alterna sua prioridade. O campo

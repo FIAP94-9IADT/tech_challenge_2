@@ -19,8 +19,9 @@ Arquivos gerados:
 - `convergence.png`: evolução da aptidão;
 - `daily_report.md`: instruções para a equipe.
 
-A integração Gemini é o modo padrão. Para uma execução determinística e sem acesso
-externo, acrescente `--llm local`.
+A integração Gemini é o modo padrão. Copie `.env.example` para `.env` e informe uma
+chave criada no Google AI Studio; `.env` não é versionado. Para uma execução
+determinística e sem acesso externo, acrescente `--llm local`.
 
 ## Perguntas em linguagem natural
 

@@ -31,8 +31,14 @@ def main() -> None:
     save_solution(output / "solution.json", problem, solution)
     save_route_map(problem, solution, output / "routes_map.html")
     save_convergence_plot(optimizer.history, output / "convergence.png")
-    generator = GeminiReportGenerator() if args.llm == "gemini" else LocalReportGenerator()
-    (output / "daily_report.md").write_text(generator.generate(problem, solution), encoding="utf-8")
+    try:
+        generator = GeminiReportGenerator() if args.llm == "gemini" else LocalReportGenerator()
+        report = generator.generate(problem, solution)
+    except RuntimeError as exc:
+        report = LocalReportGenerator().generate(problem, solution)
+        report += f"\n\n> Relatório local utilizado porque o Gemini ficou indisponível: {exc}"
+        print(f"Aviso: {exc}")
+    (output / "daily_report.md").write_text(report, encoding="utf-8")
     improvement = 100 * (baseline.fitness - solution.fitness) / baseline.fitness
     print(f"Fitness: {solution.fitness:.2f} | Distância: {solution.total_distance_km:.2f} km | Viável: {solution.feasible}")
     print(f"Variação frente ao vizinho mais próximo: {improvement:+.2f}% | Saída: {output.resolve()}")

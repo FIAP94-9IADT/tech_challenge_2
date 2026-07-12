@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
 import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
 from dataclasses import asdict
+from pathlib import Path
 
 from .models import Problem, Solution
 
@@ -15,9 +17,28 @@ SYSTEM_INSTRUCTION = """Você é um analista de logística hospitalar. Use somen
 fornecidos. Não invente endereços, tempos, ocorrências ou economias. Escreva em português
 brasileiro, com instruções objetivas. Sinalize explicitamente restrições violadas."""
 
-# Credencial pública criada exclusivamente para a demonstração acadêmica.
-PROJECT_GEMINI_API_KEY = "AQ.Ab8RN6JqASfeVZVyZ-qr21uUcf-L7rwxK89kcZHIBp9Rbj8trg"
-PROJECT_GEMINI_MODEL = "gemini-2.5-flash"
+PROJECT_GEMINI_MODEL = "gemini-3.5-flash"
+
+
+def _load_local_key() -> str | None:
+    """Lê a chave de um `.env` local ignorado pelo Git."""
+    env_path = Path(__file__).resolve().parents[2] / ".env"
+    if not env_path.exists():
+        return None
+    values: dict[str, str] = {}
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, value = line.split("=", 1)
+        if name.strip() in {"GOOGLE_API_KEY", "GEMINI_API_KEY"}:
+            values[name.strip()] = value.strip().strip("'\"")
+    return values.get("GOOGLE_API_KEY") or values.get("GEMINI_API_KEY") or None
+
+
+def configured_gemini_key() -> str | None:
+    """Prioriza variáveis do processo e usa `.env` somente no ambiente local."""
+    return os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or _load_local_key()
 
 
 def route_context(problem: Problem, solution: Solution) -> dict:
@@ -78,14 +99,19 @@ class GeminiReportGenerator(ReportGenerator):
     """Integração REST com um modelo Gemini pré-treinado."""
 
     def __init__(self, api_key: str | None = None, model: str | None = None):
-        self.api_key = api_key or PROJECT_GEMINI_API_KEY
+        self.api_key = api_key or configured_gemini_key()
         self.model = model or PROJECT_GEMINI_MODEL
+        if not self.api_key:
+            raise RuntimeError(
+                "Chave Gemini não configurada. Defina GOOGLE_API_KEY ou GEMINI_API_KEY "
+                "no ambiente, no kernel ou em um arquivo .env local."
+            )
 
     def generate(self, problem: Problem, solution: Solution, task: str = "daily") -> str:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         body = {
             "contents": [{"parts": [{"text": build_prompt(problem, solution, task)}]}],
-            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2048},
+            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 8192},
         }
         request = urllib.request.Request(
             url,
@@ -95,7 +121,20 @@ class GeminiReportGenerator(ReportGenerator):
         try:
             with urllib.request.urlopen(request, timeout=45) as response:
                 data = json.load(response)
-            return data["candidates"][0]["content"]["parts"][0]["text"]
+            candidate = data["candidates"][0]
+            parts = candidate["content"]["parts"]
+            visible_parts = [part["text"] for part in parts if "text" in part and not part.get("thought")]
+            if not visible_parts:
+                visible_parts = [part["text"] for part in parts if "text" in part]
+            result = "\n".join(visible_parts).strip()
+            if not result:
+                raise RuntimeError("O Gemini retornou uma resposta sem conteúdo textual.")
+            if candidate.get("finishReason") == "MAX_TOKENS":
+                raise RuntimeError(
+                    "O Gemini interrompeu o relatório por limite de tokens. "
+                    "Reduza o cenário ou solicite um relatório mais conciso."
+                )
+            return result
         except urllib.error.HTTPError as exc:
             try:
                 detail = json.loads(exc.read().decode("utf-8"))["error"]["message"]
