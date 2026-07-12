@@ -15,7 +15,6 @@ resource "docker_image" "optimizer" {
 resource "docker_container" "optimizer" {
   name  = "hospital-routes"
   image = docker_image.optimizer.image_id
-  env   = var.gemini_api_key == "" ? [] : ["GEMINI_API_KEY=${var.gemini_api_key}"]
   volumes {
     host_path      = abspath("${path.module}/../outputs")
     container_path = "/app/outputs"

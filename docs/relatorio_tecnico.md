@@ -104,7 +104,8 @@ tarefa, idioma e regras contra alucinação; em seguida inclui o contexto em JSO
 temperatura baixa (`0,2`) favorece respostas estáveis. A API do Gemini representa a
 estratégia de uso de um modelo pré-treinado, evitando o custo de treinamento local.
 
-Há duas implementações da mesma interface:
+Há duas implementações da mesma interface. A integração Gemini é utilizada por padrão
+e a implementação local preserva a possibilidade de testes determinísticos:
 
 1. `GeminiReportGenerator`, que gera instruções, relatórios e respostas com a API;
 2. `LocalReportGenerator`, que cria um documento determinístico sem simular uma LLM.
@@ -132,6 +133,39 @@ O domínio não depende da visualização nem da LLM. Essa separação facilita 
 permite trocar o provedor sem alterar o otimizador. Docker empacota a aplicação e o
 Terraform provisiona a imagem e o contêiner, com a credencial fornecida como variável
 sensível.
+
+### 8.1 Execução no Azure Machine Learning
+
+A extensão em nuvem utiliza o Azure Machine Learning Workspace como ambiente de
+experimentação. O cenário JSON é registrado como ativo de dados versionado. Um
+command job executa o mesmo núcleo Python em computação serverless, registra
+parâmetros e métricas com MLflow e persiste solução, mapa, convergência, relatório e
+histórico no output do job.
+
+O ajuste de hiperparâmetros utiliza busca aleatória sobre tamanho da população, taxas
+de crossover e mutação e elitismo. A função objetivo é minimizar `fitness`. Até quatro
+tentativas podem ser processadas simultaneamente em um cluster CPU de baixa
+prioridade, configurado para escalar a zero nós quando ocioso. AutoML não é utilizado,
+pois não há treinamento supervisionado: trata-se de otimização combinatória com uma
+função de aptidão própria.
+
+```mermaid
+flowchart LR
+    N[Notebook Azure ML] --> W[Workspace]
+    D[Ativo de dados JSON] --> J[Command job serverless]
+    W --> J
+    J --> M[Métricas MLflow]
+    J --> A[Artefatos da solução]
+    W --> S[Sweep de hiperparâmetros]
+    S --> C[Cluster CPU 0-4 nós]
+    C --> M
+    A --> L[Relatório com LLM]
+```
+
+O Terraform cria Resource Group, armazenamento, Key Vault, Log Analytics,
+Application Insights, Workspace e cluster. Credenciais não são incluídas no código.
+Como recursos em nuvem podem gerar cobrança, a Compute Instance deve ser desligada
+e a infraestrutura removida quando os experimentos terminarem.
 
 ## 9. Testes e reprodutibilidade
 

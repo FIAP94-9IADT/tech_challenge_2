@@ -16,7 +16,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Otimiza rotas hospitalares")
     parser.add_argument("--input", default="data/deliveries.json")
     parser.add_argument("--output", default="outputs")
-    parser.add_argument("--llm", choices=("local", "gemini"), default="local")
+    parser.add_argument("--llm", choices=("local", "gemini"), default="gemini")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--generations", type=int, default=300)
     args = parser.parse_args()

@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/data.schema.json
+type: uri_file
+name: hospital-deliveries
+version: 1
+description: Cenário fictício de entregas hospitalares.
+path: ../data/deliveries.json

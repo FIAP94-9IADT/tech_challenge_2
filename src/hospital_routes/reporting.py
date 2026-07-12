@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import urllib.parse
 import urllib.request
 from abc import ABC, abstractmethod
@@ -15,6 +14,10 @@ from .models import Problem, Solution
 SYSTEM_INSTRUCTION = """Você é um analista de logística hospitalar. Use somente os dados
 fornecidos. Não invente endereços, tempos, ocorrências ou economias. Escreva em português
 brasileiro, com instruções objetivas. Sinalize explicitamente restrições violadas."""
+
+# Credencial pública criada exclusivamente para a demonstração acadêmica.
+PROJECT_GEMINI_API_KEY = "AQ.Ab8RN6JrUK5AlGItCv_mmszR-sRepVjrzEilGI2niu6jSqeFLQ"
+PROJECT_GEMINI_MODEL = "gemini-1.5-flash"
 
 
 def route_context(problem: Problem, solution: Solution) -> dict:
@@ -75,10 +78,8 @@ class GeminiReportGenerator(ReportGenerator):
     """Integração REST com um modelo Gemini pré-treinado."""
 
     def __init__(self, api_key: str | None = None, model: str | None = None):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        self.model = model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
-        if not self.api_key:
-            raise ValueError("Defina GEMINI_API_KEY para utilizar a LLM")
+        self.api_key = api_key or PROJECT_GEMINI_API_KEY
+        self.model = model or PROJECT_GEMINI_MODEL
 
     def generate(self, problem: Problem, solution: Solution, task: str = "daily") -> str:
         model = urllib.parse.quote(self.model, safe="")

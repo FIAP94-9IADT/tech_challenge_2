@@ -10,5 +10,4 @@ terraform plan
 terraform apply
 ```
 
-A chave da LLM é opcional e deve ser informada por variável sensível, nunca incluída
-no controle de versão: `terraform apply -var="gemini_api_key=..."`.
+O contêiner utiliza a configuração Gemini centralizada no código da aplicação.

@@ -19,8 +19,8 @@ Arquivos gerados:
 - `convergence.png`: evolução da aptidão;
 - `daily_report.md`: instruções para a equipe.
 
-Para a LLM, carregue as variáveis do `.env` no terminal e acrescente `--llm gemini`.
-O arquivo `.env` não é lido automaticamente para evitar dependência adicional.
+A integração Gemini é o modo padrão. Para uma execução determinística e sem acesso
+externo, acrescente `--llm local`.
 
 ## Perguntas em linguagem natural
 

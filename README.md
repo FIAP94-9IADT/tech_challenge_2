@@ -26,6 +26,14 @@ Abra `notebooks/projeto_completo.ipynb` no VS Code ou Jupyter, selecione o kerne
 `.venv` e use **Executar tudo**. O próprio notebook prepara o projeto, permite alterar
 cenário e parâmetros, acompanha a convergência e gera todos os arquivos em `outputs`.
 
+## Azure Machine Learning
+
+A pasta `azure` contém o script de experimento, ambiente, ativo de dados, job
+serverless e sweep de hiperparâmetros. A infraestrutura do workspace e do cluster CPU
+fica em `infra/azure`. Depois do provisionamento, abra `notebooks/azure_ml.ipynb`,
+informe assinatura, Resource Group e workspace e execute as células para registrar os
+ativos e submeter os jobs.
+
 A interface permite alterar quantidade de entregas e veículos, capacidade, autonomia,
 população, gerações, taxas de crossover e mutação e semente aleatória. Os pontos de
 entrega podem ser arrastados no mapa; um clique curto alterna sua prioridade. O campo
@@ -50,9 +58,8 @@ execução do Windows. Use diretamente o interpretador do ambiente virtual:
 .\.venv\Scripts\python.exe -m hospital_routes.cli --input data/deliveries.json --output outputs
 ```
 
-Sem uma chave de API, o relatório é produzido por um gerador local determinístico.
-Para usar o Gemini, copie `.env.example` para `.env`, defina `GEMINI_API_KEY` e use
-`--llm gemini`.
+Os relatórios usam por padrão a integração Gemini configurada no projeto. O modo
+determinístico permanece disponível com `--llm local` para testes sem acesso à rede.
 
 ```bash
 pytest
