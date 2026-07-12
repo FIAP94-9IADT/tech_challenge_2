@@ -1,0 +1,3 @@
+[console_scripts]
+hospital-routes = hospital_routes.cli:main
+hospital-routes-gui = hospital_routes.gui:main

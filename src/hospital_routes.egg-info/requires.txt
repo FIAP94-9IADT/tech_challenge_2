@@ -1,0 +1,7 @@
+folium<1,>=0.15
+matplotlib<4,>=3.8
+pygame<3,>=2.6
+
+[dev]
+pytest<9,>=8
+jupyter<2,>=1

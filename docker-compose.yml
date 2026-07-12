@@ -1,0 +1,8 @@
+services:
+  optimizer:
+    build: .
+    volumes:
+      - ./outputs:/app/outputs
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}

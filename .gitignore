@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.env
+outputs/*
+!outputs/.gitkeep
+.codex-tmp-deps/
+.aulas_extraidas.txt
