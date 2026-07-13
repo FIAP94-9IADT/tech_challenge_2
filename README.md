@@ -42,7 +42,7 @@ ativos e submeter os jobs.
 Crie uma chave em um projeto autorizado no Google AI Studio e mantenha-a fora do Git.
 Para execução local, copie `.env.example` para `.env` e preencha `GEMINI_API_KEY`.
 Os notebooks informam se a chave foi detectada e continuam com o gerador local quando
-ela não estiver disponível. Em Docker e Azure, forneça `GEMINI_API_KEY` como variável
+ela não estiver disponível. No Azure, forneça `GEMINI_API_KEY` como variável
 protegida.
 
 A interface permite alterar quantidade de entregas e veículos, capacidade, autonomia,
@@ -74,20 +74,20 @@ determinístico permanece disponível com `--llm local` para testes sem acesso �
 
 ```bash
 pytest
-jupyter notebook notebooks/demonstracao.ipynb
+jupyter notebook notebooks/projeto_completo.ipynb
 ```
 
 ## Estrutura
 
 - `src/hospital_routes`: modelos, algoritmo genético, baselines, mapas e relatórios;
 - `data`: cenário fictício e reproduzível;
-- `notebooks`: demonstração explicada e análise dos resultados;
+- `notebooks`: execução completa do projeto e experimentação no Azure ML;
 - `tests`: testes unitários e de integração;
 - `docs`: relatório técnico, arquitetura e documentação de uso;
-- `infra`: infraestrutura como código para execução conteinerizada em nuvem.
+- `infra/azure`: infraestrutura como código para o Azure Machine Learning.
 
 Não há API REST nesta arquitetura. A solução é disponibilizada pela interface Pygame,
 notebooks, CLI e job do Azure ML; por isso, a documentação HTTP não se aplica.
 
-Consulte [docs/relatorio_tecnico.md](docs/relatorio_tecnico.md) para as decisões de
+Consulte [docs/relatorio_tecnico.pdf](docs/relatorio_tecnico.pdf) para as decisões de
 modelagem, limitações e análises.

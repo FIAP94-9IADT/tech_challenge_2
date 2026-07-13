@@ -1,7 +1,0 @@
-services:
-  optimizer:
-    build: .
-    volumes:
-      - ./outputs:/app/outputs
-    environment:
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}

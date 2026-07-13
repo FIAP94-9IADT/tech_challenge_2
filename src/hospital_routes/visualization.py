@@ -8,7 +8,8 @@ from .genetic import GenerationStats
 from .models import Problem, Solution
 
 
-def save_route_map(problem: Problem, solution: Solution, path: str | Path) -> None:
+def create_route_map(problem: Problem, solution: Solution) -> object:
+    """Cria um mapa Folium pronto para exibição em notebooks."""
     import folium
 
     colors = ["blue", "green", "purple", "orange", "darkred", "cadetblue"]
@@ -32,7 +33,14 @@ def save_route_map(problem: Problem, solution: Solution, path: str | Path) -> No
         points.append(points[0])
         if route:
             folium.PolyLine(points, color=color, weight=4, tooltip=problem.vehicles[i].id).add_to(map_)
+    return map_
+
+
+def save_route_map(problem: Problem, solution: Solution, path: str | Path) -> object:
+    """Salva o mapa HTML e devolve o mesmo objeto para usos interativos."""
+    map_ = create_route_map(problem, solution)
     map_.save(str(path))
+    return map_
 
 
 def save_convergence_plot(history: list[GenerationStats], path: str | Path) -> None:
