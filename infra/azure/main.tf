@@ -6,9 +6,12 @@ terraform {
   }
 }
 
-provider "azurerm" { features {} }
+provider "azurerm" {
+  features {}
+}
 
-data "azurerm_client_config" "current" {}
+data "azurerm_client_config" "current" {
+}
 
 resource "random_string" "suffix" {
   length  = 6
@@ -77,7 +80,9 @@ resource "azurerm_machine_learning_workspace" "main" {
   key_vault_id            = azurerm_key_vault.main.id
   storage_account_id      = azurerm_storage_account.main.id
   public_network_access_enabled = true
-  identity { type = "SystemAssigned" }
+  identity {
+    type = "SystemAssigned"
+  }
   tags = local.tags
 }
 
@@ -94,6 +99,8 @@ resource "azurerm_machine_learning_compute_cluster" "cpu" {
     max_node_count                       = var.max_compute_nodes
     scale_down_nodes_after_idle_duration = "PT2M"
   }
-  identity { type = "SystemAssigned" }
+  identity {
+    type = "SystemAssigned"
+  }
   tags = local.tags
 }
