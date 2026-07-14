@@ -17,7 +17,7 @@ SYSTEM_INSTRUCTION = """Você é um analista de logística hospitalar. Use somen
 fornecidos. Não invente endereços, tempos, ocorrências ou economias. Escreva em português
 brasileiro, com instruções objetivas. Avise com clareza quando houver alguma restrição violada."""
 
-PROJECT_GEMINI_MODEL = "gemini-3.5-flash"
+PROJECT_GEMINI_MODEL = "gemini-3.1-flash-lite"
 
 
 def _load_local_key() -> str | None:
