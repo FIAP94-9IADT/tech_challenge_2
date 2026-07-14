@@ -36,10 +36,10 @@ Os nomes do resource group e workspace aparecem nos outputs. A criação gera cu
 ao encerrar os experimentos, use `terraform destroy`. A autenticação utiliza a sessão
 do Azure CLI e nenhuma credencial é armazenada no repositório.
 
-## Entrega como IaC
+## Utilização do IaC
 
 O estado (`terraform.tfstate`) e o plano (`tfplan`) são artefatos locais e não devem
-ser versionados. O avaliador aplica os mesmos arquivos em sua própria assinatura; o
-sufixo aleatório evita colisões de nomes globais. A saída de `terraform output` fornece
+ser versionados. Os mesmos arquivos podem ser aplicados em outra assinatura; o sufixo
+aleatório evita colisões de nomes globais. A saída de `terraform output` fornece
 `subscription_id`, `resource_group_name`, `workspace_name` e `location`, utilizados no
 notebook `notebooks/azure_ml.ipynb`.

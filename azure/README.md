@@ -20,7 +20,7 @@ e deve ser habilitado somente após a liberação da cota.
 Os resultados de cada job ficam no output nomeado `artifacts`: `solution.json`, mapa,
 convergência, relatório e histórico em CSV.
 
-## Ordem recomendada para avaliação
+## Ordem recomendada de execução
 
 1. No Azure Cloud Shell, clone o repositório e aplique `infra/azure` conforme o README
    daquela pasta. O cluster é opcional e não é necessário para o job principal.
@@ -38,6 +38,7 @@ dados, submete o job serverless, acompanha sua conclusão e baixa os artefatos. 
 ## Segurança no envio do código
 
 O arquivo `.amlignore` limita o pacote enviado ao Azure ML e exclui `.env`, histórico
-Git, notebooks, infraestrutura, testes e resultados locais. A chave do Gemini não é
-necessária para validar a otimização: sem a variável `GEMINI_API_KEY`, o job gera o
-relatório determinístico local. Nenhuma credencial deve ser inserida nos manifestos.
+Git, notebooks, infraestrutura, testes, dados locais e resultados anteriores. A chave
+do Gemini não é necessária para executar a otimização: sem a variável
+`GEMINI_API_KEY`, o job gera o relatório determinístico local. Nenhuma credencial deve
+ser inserida nos manifestos.

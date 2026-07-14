@@ -42,8 +42,9 @@ ativos e submeter os jobs.
 Crie uma chave em um projeto autorizado no Google AI Studio e mantenha-a fora do Git.
 Para execução local, copie `.env.example` para `.env` e preencha `GEMINI_API_KEY`.
 Os notebooks informam se a chave foi detectada e continuam com o gerador local quando
-ela não estiver disponível. No Azure, forneça `GEMINI_API_KEY` como variável
-protegida.
+ela não estiver disponível. O job do Azure não recebe a chave automaticamente nem a
+inclui nos manifestos: sem `GEMINI_API_KEY` no ambiente remoto, ele usa o relatório
+determinístico local e conclui normalmente a otimização.
 
 A interface permite alterar quantidade de entregas e veículos, capacidade, autonomia,
 população, gerações, taxas de crossover e mutação e semente aleatória. Os pontos de
