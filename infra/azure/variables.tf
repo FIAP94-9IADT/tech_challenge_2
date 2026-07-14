@@ -16,6 +16,12 @@ variable "compute_vm_size" {
   default     = "Standard_DS2_v2"
 }
 
+variable "create_compute_cluster" {
+  description = "Cria o cluster gerenciado usado pelo sweep; requer cota de vCPU do Azure Machine Learning"
+  type        = bool
+  default     = false
+}
+
 variable "max_compute_nodes" {
   description = "Limite de nós paralelos; zero nós são mantidos quando o cluster está ocioso"
   type        = number

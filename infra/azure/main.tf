@@ -73,20 +73,23 @@ resource "azurerm_application_insights" "main" {
 }
 
 resource "azurerm_machine_learning_workspace" "main" {
-  name                    = "${var.name_prefix}-mlw-${local.suffix}"
-  resource_group_name     = azurerm_resource_group.main.name
-  location                = azurerm_resource_group.main.location
-  application_insights_id = azurerm_application_insights.main.id
-  key_vault_id            = azurerm_key_vault.main.id
-  storage_account_id      = azurerm_storage_account.main.id
+  name                          = "${var.name_prefix}-mlw-${local.suffix}"
+  resource_group_name           = azurerm_resource_group.main.name
+  location                      = azurerm_resource_group.main.location
+  application_insights_id       = azurerm_application_insights.main.id
+  key_vault_id                  = azurerm_key_vault.main.id
+  storage_account_id            = azurerm_storage_account.main.id
   public_network_access_enabled = true
+
   identity {
     type = "SystemAssigned"
   }
+
   tags = local.tags
 }
 
 resource "azurerm_machine_learning_compute_cluster" "cpu" {
+  count                         = var.create_compute_cluster ? 1 : 0
   name                          = "cpu-cluster"
   location                      = azurerm_resource_group.main.location
   machine_learning_workspace_id = azurerm_machine_learning_workspace.main.id

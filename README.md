@@ -33,7 +33,7 @@ interpretar as métricas sem inferir tempo ou custo não observados.
 
 A pasta `azure` contém o script de experimento, ambiente, ativo de dados, job
 serverless e sweep de hiperparâmetros. A infraestrutura do workspace e do cluster CPU
-fica em `infra/azure`. Depois do provisionamento, abra `notebooks/azure_ml.ipynb`,
+opcional fica em `infra/azure`. Depois do provisionamento, abra `notebooks/azure_ml.ipynb`,
 informe assinatura, Resource Group e workspace e execute as células para registrar os
 ativos e submeter os jobs.
 

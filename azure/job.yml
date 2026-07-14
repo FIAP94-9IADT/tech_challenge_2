@@ -15,6 +15,9 @@ command: >-
   --elite-size ${{inputs.elite_size}}
   --seed ${{inputs.seed}}
 environment: azureml:hospital-routes-environment:1
+resources:
+  instance_type: Standard_DS2_v2
+  instance_count: 1
 inputs:
   scenario:
     type: uri_file
