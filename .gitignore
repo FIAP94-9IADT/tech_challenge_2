@@ -15,5 +15,3 @@ crash.log
 !*.tfvars.example
 outputs/*
 !outputs/.gitkeep
-.codex-tmp-deps/
-.aulas_extraidas.txt
