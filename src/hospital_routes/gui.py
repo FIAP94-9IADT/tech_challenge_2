@@ -109,7 +109,7 @@ class RouteApp:
         population_size = max(10, self.fields["population"].number())
         elite_size = self.fields["elite"].number()
         if elite_size < 0 or elite_size >= population_size:
-            raise ValueError("Elitismo deve estar entre zero e população menos um")
+            raise ValueError(f"o elitismo deve estar entre 0 e {population_size - 1}")
         return GAConfig(
             population_size=population_size,
             generations=max(1, self.fields["generations"].number()),
@@ -326,7 +326,7 @@ class RouteApp:
             self.screen.blit(self.small.render(text, True, (55, 65, 78)), (legend.x + 30, y - 2))
 
         if self.solution:
-            note = self.small.render("Cores da rota = veículo", True, (75, 86, 101))
+            note = self.small.render("Cada cor representa um veículo", True, (75, 86, 101))
             self.screen.blit(note, (MAP_RECT.right - note.get_width() - 12, MAP_RECT.top + 12))
         self._draw_coordinate_tooltip()
 
@@ -381,15 +381,15 @@ class RouteApp:
                 "Botão direito em uma entrega: remover a entrega",
                 "Arrastar uma entrega: alterar sua posição",
                 "Clique curto: alternar prioridade entre 1, 2 e 3",
-                "Manter o cursor: consultar coordenadas e dados",
+                "Posicionar o cursor: consultar coordenadas e dados",
             ]),
             ("CENÁRIO", [
                 "Novo cenário: sortear dados e posições",
                 "Aplicar dados: usar os valores informados nos campos",
             ]),
             ("EXECUÇÃO", [
-                "Otimizar: executar gerações e atualizar gráficos",
-                "Salvar: gravar a solução interativa em outputs",
+                "Otimizar: executar o algoritmo e atualizar os gráficos",
+                "Salvar: gravar a solução na pasta outputs",
             ]),
         ]
         all_lines = [line for _, lines in sections for line in lines]

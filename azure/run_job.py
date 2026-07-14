@@ -84,9 +84,9 @@ def main() -> None:
     try:
         report = GeminiReportGenerator().generate(problem, solution, comparison=comparison)
     except RuntimeError as exc:
-        # O job de otimização continua auditável mesmo se o provedor estiver indisponível.
+        # A otimização e os demais artefatos não dependem da disponibilidade do Gemini.
         report = LocalReportGenerator().generate(problem, solution, comparison=comparison)
-        report += f"\n\n> Integração generativa indisponível durante o job: {exc}"
+        report += f"\n\n> O relatório local foi usado porque o Gemini não estava disponível: {exc}"
     (output / "daily_report.md").write_text(report, encoding="utf-8")
     with (output / "history.csv").open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)

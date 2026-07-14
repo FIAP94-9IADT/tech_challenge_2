@@ -2,7 +2,7 @@ $schema: https://azuremlschemas.azureedge.net/latest/sweepJob.schema.json
 type: sweep
 display_name: hospital-routes-hyperparameter-sweep
 experiment_name: hospital-routes-sweep
-description: Busca dos parâmetros genéticos que minimizam o fitness.
+description: Busca de hiperparâmetros do algoritmo genético para minimizar o fitness.
 sampling_algorithm: random
 search_space:
   population_size:

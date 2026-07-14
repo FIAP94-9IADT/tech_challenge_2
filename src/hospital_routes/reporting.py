@@ -15,7 +15,7 @@ from .models import Problem, Solution
 
 SYSTEM_INSTRUCTION = """Você é um analista de logística hospitalar. Use somente os dados
 fornecidos. Não invente endereços, tempos, ocorrências ou economias. Escreva em português
-brasileiro, com instruções objetivas. Sinalize explicitamente restrições violadas."""
+brasileiro, com instruções objetivas. Avise com clareza quando houver alguma restrição violada."""
 
 PROJECT_GEMINI_MODEL = "gemini-3.5-flash"
 
@@ -119,7 +119,7 @@ class ReportGenerator(ABC):
 
 
 class LocalReportGenerator(ReportGenerator):
-    """Fallback auditável para execução acadêmica sem credenciais externas."""
+    """Gera um relatório determinístico quando a integração externa não está disponível."""
 
     def generate(
         self,
@@ -135,15 +135,22 @@ class LocalReportGenerator(ReportGenerator):
                 "",
                 "## Comparação de eficiência",
                 (
-                    f"Referência: {comparison['referencia']}; redução de fitness: "
-                    f"{comparison['reducao_fitness_percentual']:.2f}%; variação de distância: "
+                    f"Em comparação com {comparison['referencia']}, o fitness variou "
+                    f"{comparison['reducao_fitness_percentual']:.2f}% e a distância variou "
                     f"{comparison['reducao_distancia_km']:.2f} km."
                 ),
                 comparison["observacao"],
             ])
         for i, route in enumerate(solution.routes):
             vehicle, metric = problem.vehicles[i], solution.metrics[i]
-            lines.extend(["", f"## {vehicle.id}", f"Carga: {metric.load_kg:.1f}/{vehicle.capacity_kg:.1f} kg; percurso: {metric.distance_km:.2f}/{vehicle.max_distance_km:.2f} km."])
+            lines.extend([
+                "",
+                f"## {vehicle.id}",
+                (
+                    f"Carga: {metric.load_kg:.1f} kg de {vehicle.capacity_kg:.1f} kg; "
+                    f"percurso: {metric.distance_km:.2f} km de {vehicle.max_distance_km:.2f} km."
+                ),
+            ])
             if not route:
                 lines.append("Veículo não utilizado.")
                 continue
@@ -152,7 +159,14 @@ class LocalReportGenerator(ReportGenerator):
                 label = "CRÍTICA" if delivery.priority == 3 else ("ALTA" if delivery.priority == 2 else "REGULAR")
                 lines.append(f"{order}. {delivery.name} — {delivery.demand_kg:.1f} kg — prioridade {label}.")
             lines.append(f"{len(route) + 1}. Retornar ao depósito {problem.depot.name}.")
-        lines.extend(["", "## Recomendações", "Confirmar disponibilidade da carga antes da saída e registrar horários reais para comparar planejado e realizado."])
+        lines.extend([
+            "",
+            "## Recomendações",
+            (
+                "Confirme a disponibilidade da carga antes da saída e registre os horários reais "
+                "para comparar o planejamento com a operação realizada."
+            ),
+        ])
         return "\n".join(lines)
 
 
@@ -164,7 +178,7 @@ class GeminiReportGenerator(ReportGenerator):
         self.model = model or PROJECT_GEMINI_MODEL
         if not self.api_key:
             raise RuntimeError(
-                "Chave Gemini não configurada. Defina GOOGLE_API_KEY ou GEMINI_API_KEY "
+                "A chave do Gemini não foi encontrada. Defina GOOGLE_API_KEY ou GEMINI_API_KEY "
                 "no ambiente, no kernel ou em um arquivo .env local."
             )
 

@@ -37,11 +37,12 @@ def main() -> None:
         report = generator.generate(problem, solution, comparison=comparison)
     except RuntimeError as exc:
         report = LocalReportGenerator().generate(problem, solution, comparison=comparison)
-        report += f"\n\n> Relatório local utilizado porque o Gemini ficou indisponível: {exc}"
+        report += f"\n\n> O relatório local foi usado porque o Gemini não estava disponível: {exc}"
         print(f"Aviso: {exc}")
     (output / "daily_report.md").write_text(report, encoding="utf-8")
     improvement = 100 * (baseline.fitness - solution.fitness) / baseline.fitness
-    print(f"Fitness: {solution.fitness:.2f} | Distância: {solution.total_distance_km:.2f} km | Viável: {solution.feasible}")
+    status = "viável" if solution.feasible else "com violações"
+    print(f"Fitness: {solution.fitness:.2f} | Distância: {solution.total_distance_km:.2f} km | Status: {status}")
     print(f"Variação frente ao vizinho mais próximo: {improvement:+.2f}% | Saída: {output.resolve()}")
 
 

@@ -28,6 +28,6 @@ variable "max_compute_nodes" {
   default     = 4
   validation {
     condition     = var.max_compute_nodes >= 1 && var.max_compute_nodes <= 4
-    error_message = "Use entre um e quatro nós para limitar o custo acadêmico."
+    error_message = "Defina entre um e quatro nós para manter o consumo de recursos controlado."
   }
 }

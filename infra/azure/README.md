@@ -1,45 +1,65 @@
 # Infraestrutura Azure
 
 O Terraform provisiona Resource Group, Storage Account, Key Vault, Log Analytics,
-Application Insights e Azure Machine Learning Workspace. Por padrão, o cluster CPU
-não é criado, o que permite concluir a infraestrutura mesmo em assinaturas com cota
-de vCPU igual a zero.
+Application Insights e Azure Machine Learning Workspace. O cluster do sweep é
+opcional e não é criado por padrão. Dessa forma, o workspace pode ser provisionado
+mesmo quando a assinatura ainda não possui cota de vCPU.
+
+## Provisionamento
+
+Em uma sessão autenticada do Azure Cloud Shell, execute:
 
 ```bash
-az login
 terraform init
-terraform plan
-terraform apply
+terraform fmt -check
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
 terraform output
 ```
 
-Para executar jobs, a assinatura também precisa ter cota de computação do Azure
-Machine Learning na região escolhida. Isso vale inclusive para jobs serverless. Após
-a liberação da cota, o cluster do sweep pode ser habilitado com:
+Os outputs apresentam `subscription_id`, `resource_group_name`, `workspace_name` e
+`location`. Esses valores são usados na configuração do notebook
+`notebooks/azure_ml.ipynb`.
+
+## Cota e cluster opcional
+
+Jobs serverless também consomem cota do Azure Machine Learning. Consulte a cota da
+região com:
 
 ```bash
 az ml compute list-usage \
   --resource-group "$(terraform output -raw resource_group_name)" \
   --workspace-name "$(terraform output -raw workspace_name)" \
-  --location brazilsouth \
+  --location "$(terraform output -raw location)" \
   --output table
-
-terraform apply -var="create_compute_cluster=true"
 ```
 
-O cluster usa nós de baixa prioridade, escala de zero a quatro e retorna a zero após
-dois minutos ocioso. Para `Standard_DS2_v2`, cada nó usa duas vCPUs; quatro nós
-exigem cota para até oito vCPUs. O limite pode ser reduzido, por exemplo, com
-`-var="max_compute_nodes=1"`.
+Depois que a cota estiver disponível, crie o cluster do sweep com:
 
-Os nomes do resource group e workspace aparecem nos outputs. A criação gera custos;
-ao encerrar os experimentos, use `terraform destroy`. A autenticação utiliza a sessão
-do Azure CLI e nenhuma credencial é armazenada no repositório.
+```bash
+terraform apply \
+  -var="create_compute_cluster=true" \
+  -var="max_compute_nodes=1"
+```
 
-## Utilização do IaC
+O cluster usa nós de baixa prioridade e volta a zero depois de dois minutos ocioso.
+Cada `Standard_DS2_v2` usa duas vCPUs. O limite pode chegar a quatro nós, desde que a
+assinatura tenha cota suficiente.
 
-O estado (`terraform.tfstate`) e o plano (`tfplan`) são artefatos locais e não devem
-ser versionados. Os mesmos arquivos podem ser aplicados em outra assinatura; o sufixo
-aleatório evita colisões de nomes globais. A saída de `terraform output` fornece
-`subscription_id`, `resource_group_name`, `workspace_name` e `location`, utilizados no
-notebook `notebooks/azure_ml.ipynb`.
+## Estado e encerramento
+
+`terraform.tfstate` e `tfplan` são arquivos locais e não devem ser versionados. O
+sufixo aleatório dos recursos evita colisões de nomes quando o IaC é aplicado em outra
+assinatura.
+
+Os recursos podem gerar cobrança. Quando não forem mais necessários, revise o plano de
+remoção e encerre a infraestrutura:
+
+```bash
+terraform plan -destroy
+terraform destroy
+```
+
+A autenticação usa a sessão do Azure CLI; nenhuma credencial é armazenada no
+repositório.

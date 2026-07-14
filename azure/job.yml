@@ -36,4 +36,4 @@ outputs:
 tags:
   method: genetic-algorithm
   problem: hospital-vrp
-# A ausência de `compute` faz o command job utilizar computação serverless.
+# Sem o campo `compute`, o job usa computação serverless.
