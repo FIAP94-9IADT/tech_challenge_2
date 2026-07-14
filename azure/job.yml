@@ -1,0 +1,39 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+display_name: hospital-routes-genetic-optimizer
+experiment_name: hospital-routes
+description: Otimização genética de um cenário hospitalar em computação serverless.
+code: ..
+command: >-
+  python azure/run_job.py
+  --input ${{inputs.scenario}}
+  --output ${{outputs.artifacts}}
+  --population-size ${{inputs.population_size}}
+  --generations ${{inputs.generations}}
+  --crossover-rate ${{inputs.crossover_rate}}
+  --mutation-rate ${{inputs.mutation_rate}}
+  --elite-size ${{inputs.elite_size}}
+  --seed ${{inputs.seed}}
+environment: azureml:hospital-routes-environment:1
+resources:
+  instance_type: Standard_DS2_v2
+  instance_count: 1
+inputs:
+  scenario:
+    type: uri_file
+    path: azureml:hospital-deliveries:1
+    mode: download
+  population_size: 120
+  generations: 300
+  crossover_rate: 0.90
+  mutation_rate: 0.20
+  elite_size: 4
+  seed: 42
+outputs:
+  artifacts:
+    type: uri_folder
+    mode: rw_mount
+tags:
+  method: genetic-algorithm
+  problem: hospital-vrp
+# Sem o campo `compute`, o job usa computação serverless.

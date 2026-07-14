@@ -1,0 +1,20 @@
+{
+  "depot": {"name": "Hospital Central", "latitude": -12.9714, "longitude": -38.5014},
+  "vehicles": [
+    {"id": "VAN-01", "capacity_kg": 55.0, "max_distance_km": 65.0},
+    {"id": "VAN-02", "capacity_kg": 45.0, "max_distance_km": 55.0},
+    {"id": "UTIL-03", "capacity_kg": 45.0, "max_distance_km": 45.0}
+  ],
+  "deliveries": [
+    {"id": "E01", "name": "UPA Brotas", "latitude": -12.9924, "longitude": -38.4894, "demand_kg": 18.0, "priority": 3, "service_minutes": 15},
+    {"id": "E02", "name": "UBS Federação", "latitude": -13.0014, "longitude": -38.5068, "demand_kg": 12.0, "priority": 2, "service_minutes": 12},
+    {"id": "E03", "name": "Unidade Barra", "latitude": -13.0093, "longitude": -38.5327, "demand_kg": 16.0, "priority": 1, "service_minutes": 10},
+    {"id": "E04", "name": "Unidade Itapuã", "latitude": -12.9486, "longitude": -38.3638, "demand_kg": 20.0, "priority": 3, "service_minutes": 18},
+    {"id": "E05", "name": "UBS Liberdade", "latitude": -12.9441, "longitude": -38.4951, "demand_kg": 14.0, "priority": 2, "service_minutes": 10},
+    {"id": "E06", "name": "Unidade Cabula", "latitude": -12.9585, "longitude": -38.4591, "demand_kg": 22.0, "priority": 1, "service_minutes": 12},
+    {"id": "E07", "name": "Atendimento Ondina", "latitude": -13.0058, "longitude": -38.5108, "demand_kg": 8.0, "priority": 3, "service_minutes": 8},
+    {"id": "E08", "name": "UBS Bonfim", "latitude": -12.9238, "longitude": -38.5084, "demand_kg": 10.0, "priority": 1, "service_minutes": 10},
+    {"id": "E09", "name": "Unidade Pituba", "latitude": -13.0011, "longitude": -38.4590, "demand_kg": 13.0, "priority": 2, "service_minutes": 10},
+    {"id": "E10", "name": "Atendimento Rio Vermelho", "latitude": -13.0102, "longitude": -38.4893, "demand_kg": 7.0, "priority": 3, "service_minutes": 8}
+  ]
+}

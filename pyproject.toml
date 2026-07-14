@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hospital-routes"
+version = "1.0.0"
+description = "Otimização genética de rotas hospitalares"
+requires-python = ">=3.10"
+dependencies = ["folium>=0.15,<1", "matplotlib>=3.8,<4", "pygame>=2.6,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "jupyter>=1,<2"]
+
+[project.scripts]
+hospital-routes = "hospital_routes.cli:main"
+hospital-routes-gui = "hospital_routes.gui:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

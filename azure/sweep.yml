@@ -1,0 +1,53 @@
+$schema: https://azuremlschemas.azureedge.net/latest/sweepJob.schema.json
+type: sweep
+display_name: hospital-routes-hyperparameter-sweep
+experiment_name: hospital-routes-sweep
+description: Busca de hiperparâmetros do algoritmo genético para minimizar o fitness.
+sampling_algorithm: random
+search_space:
+  population_size:
+    type: choice
+    values: [60, 120, 180]
+  crossover_rate:
+    type: uniform
+    min_value: 0.70
+    max_value: 0.95
+  mutation_rate:
+    type: uniform
+    min_value: 0.05
+    max_value: 0.40
+  elite_size:
+    type: choice
+    values: [0, 2, 4, 6]
+objective:
+  goal: minimize
+  primary_metric: fitness
+limits:
+  max_total_trials: 12
+  max_concurrent_trials: 4
+  timeout: 7200
+  trial_timeout: 1200
+compute: azureml:cpu-cluster
+inputs:
+  scenario:
+    type: uri_file
+    path: azureml:hospital-deliveries:1
+    mode: download
+  generations: 250
+  seed: 42
+outputs:
+  artifacts:
+    type: uri_folder
+trial:
+  code: ..
+  environment: azureml:hospital-routes-environment:1
+  command: >-
+    python azure/run_job.py
+    --input ${{inputs.scenario}}
+    --output ${{outputs.artifacts}}
+    --population-size ${{search_space.population_size}}
+    --generations ${{inputs.generations}}
+    --crossover-rate ${{search_space.crossover_rate}}
+    --mutation-rate ${{search_space.mutation_rate}}
+    --elite-size ${{search_space.elite_size}}
+    --seed ${{inputs.seed}}
