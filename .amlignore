@@ -16,5 +16,3 @@ infra/
 notebooks/
 tests/
 *.pdf
-.codex-tmp-deps/
-.aulas_extraidas.txt
